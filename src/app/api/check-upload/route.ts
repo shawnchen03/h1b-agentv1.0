@@ -19,7 +19,7 @@ export async function GET(req: Request) {
   try {
     const pc = new Pinecone({
       apiKey: process.env.PINECONE_API_KEY,
-      environment: "gcp-starter" // Default to gcp-starter environment
+      environment: process.env.PINECONE_ENVIRONMENT as string
     });
 
     const index = pc.index(process.env.PINECONE_INDEX_NAME);
