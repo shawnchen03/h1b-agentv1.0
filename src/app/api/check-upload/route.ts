@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { Pinecone } from '@pinecone-database/pinecone';
+import { PineconeClient } from '@pinecone-database/pinecone';
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -10,7 +10,8 @@ export async function GET(req: Request) {
   }
 
   try {
-    const pc = new Pinecone({
+    const pc = new PineconeClient();
+    await pc.init({
       apiKey: process.env.PINECONE_API_KEY as string,
       environment: process.env.PINECONE_ENVIRONMENT as string
     });
