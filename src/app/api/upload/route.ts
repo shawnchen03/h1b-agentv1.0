@@ -9,6 +9,7 @@ const openai = new OpenAI({
 
 const pinecone = new Pinecone({
   apiKey: process.env.PINECONE_API_KEY!,
+  environment: process.env.PINECONE_ENVIRONMENT as string
 });
 
 async function extractTextFromFile(file: File): Promise<string> {
@@ -57,7 +58,7 @@ export async function POST(req: NextRequest) {
 
     const embeddings = await getEmbedding(text);
     
-    const index = pinecone.index('resumerag'); // Use your actual index name
+    const index = pinecone.Index(process.env.PINECONE_INDEX_NAME as string);
     const docId = file.name || "uploaded_document";
     
     await upsertEmbeddings(index, docId, embeddings);
