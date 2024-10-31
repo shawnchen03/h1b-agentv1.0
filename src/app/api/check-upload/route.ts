@@ -11,7 +11,8 @@ export async function GET(req: Request) {
 
   try {
     const pc = new Pinecone({
-      apiKey: process.env.PINECONE_API_KEY as string
+      apiKey: process.env.PINECONE_API_KEY as string,
+      environment: process.env.PINECONE_ENVIRONMENT as string
     });
     const index = pc.Index(process.env.PINECONE_INDEX_NAME as string);
 
