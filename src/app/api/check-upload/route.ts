@@ -9,15 +9,20 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'No file name provided' }, { status: 400 });
   }
 
+  if (!process.env.PINECONE_API_KEY || !process.env.PINECONE_INDEX_NAME) {
+    return NextResponse.json(
+      { error: 'Missing required Pinecone configuration' },
+      { status: 500 }
+    );
+  }
+
   try {
     const pc = new Pinecone({
-      apiKey: process.env.PINECONE_API_KEY as string,
-      environment: process.env.PINECONE_ENVIRONMENT as string
+      apiKey: process.env.PINECONE_API_KEY,
+      environment: "gcp-starter" // Default to gcp-starter environment
     });
 
-    const index = pc.Index(process.env.PINECONE_INDEX_NAME as string);
-
-    // Using the correct fetch method according to Pinecone V1.1.0
+    const index = pc.index(process.env.PINECONE_INDEX_NAME);
     const queryResponse = await index.fetch([fileName]);
 
     // Check if the record exists in the response
