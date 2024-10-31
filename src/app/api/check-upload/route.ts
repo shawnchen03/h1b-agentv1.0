@@ -17,16 +17,14 @@ export async function GET(req: Request) {
 
     const index = pc.Index(process.env.PINECONE_INDEX_NAME as string);
 
-    const queryResponse = await index.fetch({
-      ids: [fileName],
-      namespace: '' // optional, specify if you're using namespaces
-    });
+    // Using the correct fetch method according to Pinecone V1.1.0
+    const queryResponse = await index.fetch([fileName]);
 
-    // Check if the vector exists in the response
-    if (queryResponse.vectors && queryResponse.vectors[fileName]) {
+    // Check if the record exists in the response
+    if (queryResponse.records && queryResponse.records[fileName]) {
       return NextResponse.json({ 
         exists: true, 
-        vector: queryResponse.vectors[fileName].values 
+        vector: queryResponse.records[fileName].values 
       });
     } else {
       return NextResponse.json({ exists: false });
