@@ -63,9 +63,9 @@ export default function ChatInterface() {
   const handleSendMessage = async (text: string = inputMessage) => {
     if (text.trim() === '') return;
 
-    // Add user message
     const newMessageId = chats[currentChatId - 1].messages.length + 1;
     
+    // First state update for user message
     setChats(prevChats => {
       const updatedChats = [...prevChats];
       const newUserMessage: Message = {
@@ -81,6 +81,7 @@ export default function ChatInterface() {
     setIsTyping(true);
 
     try {
+      // Single API call
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -95,11 +96,12 @@ export default function ChatInterface() {
 
       const data = await response.json();
       
+      // Second state update for AI response
       setChats(prevChats => {
         const updatedChats = [...prevChats];
         const aiMessage: Message = {
           id: newMessageId + 1,
-          text: data.text,
+          text: data.text || 'Sorry, I encountered an error processing your request.',
           sender: 'ai'
         };
         updatedChats[currentChatId - 1].messages = [...updatedChats[currentChatId - 1].messages, aiMessage];
@@ -107,7 +109,17 @@ export default function ChatInterface() {
       });
     } catch (error) {
       console.error('Error:', error);
-      // Handle error appropriately
+      // Add error message to chat
+      setChats(prevChats => {
+        const updatedChats = [...prevChats];
+        const errorMessage: Message = {
+          id: newMessageId + 1,
+          text: 'Sorry, I encountered an error. Please try again.',
+          sender: 'ai'
+        };
+        updatedChats[currentChatId - 1].messages = [...updatedChats[currentChatId - 1].messages, errorMessage];
+        return updatedChats;
+      });
     } finally {
       setIsTyping(false);
     }
