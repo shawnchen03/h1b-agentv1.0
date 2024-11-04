@@ -64,16 +64,27 @@ export default function ChatInterface() {
     if (text.trim() === '') return;
 
     const newMessageId = chats[currentChatId - 1].messages.length + 1;
+    const messageText = text.trim();
+    
+    // Create a unique identifier for this message
+    const messageKey = `${Date.now()}-${Math.random()}`;
     
     // First state update for user message
     setChats(prevChats => {
+      const currentChat = prevChats[currentChatId - 1];
+      
+      // Check if this message was already added
+      if (currentChat.messages.some(m => m.text === messageText && m.sender === 'user')) {
+        return prevChats;
+      }
+      
       const updatedChats = [...prevChats];
       const newUserMessage: Message = {
         id: newMessageId,
-        text: text,
+        text: messageText,
         sender: 'user'
       };
-      updatedChats[currentChatId - 1].messages = [...updatedChats[currentChatId - 1].messages, newUserMessage];
+      updatedChats[currentChatId - 1].messages = [...currentChat.messages, newUserMessage];
       return updatedChats;
     });
 
@@ -81,13 +92,12 @@ export default function ChatInterface() {
     setIsTyping(true);
 
     try {
-      // Single API call
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: text }),
+        body: JSON.stringify({ message: messageText }),
       });
 
       if (!response.ok) {
@@ -98,26 +108,33 @@ export default function ChatInterface() {
       
       // Second state update for AI response
       setChats(prevChats => {
+        const currentChat = prevChats[currentChatId - 1];
+        
+        // Check if this AI response was already added
+        if (currentChat.messages.some(m => m.text === data.text && m.sender === 'ai')) {
+          return prevChats;
+        }
+        
         const updatedChats = [...prevChats];
         const aiMessage: Message = {
           id: newMessageId + 1,
           text: data.text || 'Sorry, I encountered an error processing your request.',
           sender: 'ai'
         };
-        updatedChats[currentChatId - 1].messages = [...updatedChats[currentChatId - 1].messages, aiMessage];
+        updatedChats[currentChatId - 1].messages = [...currentChat.messages, aiMessage];
         return updatedChats;
       });
     } catch (error) {
       console.error('Error:', error);
       // Add error message to chat
       setChats(prevChats => {
-        const updatedChats = [...prevChats];
+        const currentChat = prevChats[currentChatId - 1];
         const errorMessage: Message = {
           id: newMessageId + 1,
           text: 'Sorry, I encountered an error. Please try again.',
           sender: 'ai'
         };
-        updatedChats[currentChatId - 1].messages = [...updatedChats[currentChatId - 1].messages, errorMessage];
+        updatedChats[currentChatId - 1].messages = [...currentChat.messages, errorMessage];
         return updatedChats;
       });
     } finally {
