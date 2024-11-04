@@ -1,6 +1,6 @@
-# AI Agent Project
+# H1B Career Advisor
 
-This is an AI Agent project built with Next.js, integrating Flowise API for advanced chatbot functionality.
+This is an AI Agent project built with Next.js, integrating Flowise API for advanced chatbot functionality and Auth0 for authentication.
 
 ## Project Structure
 
@@ -153,3 +153,16 @@ This project is licensed under the [MIT License](LICENSE).
 - `tsconfig.json`: TypeScript configuration
 
 For detailed information about each file's contents and purpose, please refer to the respective files in the project directory.
+
+## Authentication Implementation
+
+We've implemented a secure authentication system using Auth0, integrated with Next.js 13/14 App Router. The implementation includes:
+
+### 1. Auth0 Integration Components
+- Login page with Auth0 redirect
+- Protected routes using middleware
+- User context provider
+- Logout functionality
+- Session management
+
+### 2. File Structure
